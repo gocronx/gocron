@@ -196,7 +196,7 @@ func checkAppInstall(c *gin.Context) {
 		return
 	}
 	path := c.Request.URL.Path
-	if strings.HasPrefix(path, "/install") || path == "/" || strings.HasPrefix(path, "/static") || strings.HasSuffix(path, ".js") || strings.HasSuffix(path, ".css") {
+	if strings.HasPrefix(path, "/api/install") || path == "/" || strings.HasPrefix(path, "/static") || strings.HasSuffix(path, ".js") || strings.HasSuffix(path, ".css") {
 		c.Next()
 		return
 	}
@@ -254,7 +254,7 @@ func userAuth(c *gin.Context) {
 		c.Next()
 		return
 	}
-	excludePaths := []string{"", "/user/login", "/install/status"}
+	excludePaths := []string{"", "/api/user/login", "/api/install/status"}
 	for _, p := range excludePaths {
 		if uri == p {
 			c.Next()
@@ -293,13 +293,13 @@ func urlAuth(c *gin.Context) {
 	// 普通用户允许访问的URL地址
 	allowPaths := []string{
 		"",
-		"/install/status",
-		"/task",
-		"/task/log",
-		"/host",
-		"/host/all",
-		"/user/login",
-		"/user/editMyPassword",
+		"/api/install/status",
+		"/api/task",
+		"/api/task/log",
+		"/api/host",
+		"/api/host/all",
+		"/api/user/login",
+		"/api/user/editMyPassword",
 	}
 	for _, p := range allowPaths {
 		if p == uri {

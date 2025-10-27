@@ -19,17 +19,17 @@ import (
 // 系统安装
 
 type InstallForm struct {
-	DbType               string `binding:"In(mysql,postgres)"`
-	DbHost               string `binding:"Required;MaxSize(50)"`
-	DbPort               int    `binding:"Required;Range(1,65535)"`
-	DbUsername           string `binding:"Required;MaxSize(50)"`
-	DbPassword           string `binding:"Required;MaxSize(30)"`
-	DbName               string `binding:"Required;MaxSize(50)"`
-	DbTablePrefix        string `binding:"MaxSize(20)"`
-	AdminUsername        string `binding:"Required;MinSize(3)"`
-	AdminPassword        string `binding:"Required;MinSize(6)"`
-	ConfirmAdminPassword string `binding:"Required;MinSize(6)"`
-	AdminEmail           string `binding:"Required;Email;MaxSize(50)"`
+	DbType               string `form:"db_type" binding:"required,oneof=mysql postgres"`
+	DbHost               string `form:"db_host" binding:"required,max=50"`
+	DbPort               int    `form:"db_port" binding:"required,min=1,max=65535"`
+	DbUsername           string `form:"db_username" binding:"required,max=50"`
+	DbPassword           string `form:"db_password" binding:"required,max=30"`
+	DbName               string `form:"db_name" binding:"required,max=50"`
+	DbTablePrefix        string `form:"db_table_prefix" binding:"max=20"`
+	AdminUsername        string `form:"admin_username" binding:"required,min=3"`
+	AdminPassword        string `form:"admin_password" binding:"required,min=6"`
+	ConfirmAdminPassword string `form:"confirm_admin_password" binding:"required,min=6"`
+	AdminEmail           string `form:"admin_email" binding:"required,email,max=50"`
 }
 
 
@@ -37,7 +37,7 @@ type InstallForm struct {
 // 安装
 func Store(c *gin.Context) {
 	var form InstallForm
-	if err := c.ShouldBindJSON(&form); err != nil {
+	if err := c.ShouldBind(&form); err != nil {
 		json := utils.JsonResponse{}
 		result := json.CommonFailure("表单验证失败, 请检测输入")
 		c.String(http.StatusOK, result)
@@ -107,6 +107,7 @@ func Store(c *gin.Context) {
 	// 更新版本号文件
 	app.UpdateVersionFile()
 
+	// 标记为已安装
 	app.Installed = true
 	// 初始化定时任务
 	service.ServiceTask.Initialize()

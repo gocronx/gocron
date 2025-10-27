@@ -273,8 +273,8 @@ func UpdateMyPassword(c *gin.Context) {
 
 // ValidateLogin 验证用户登录
 func ValidateLogin(c *gin.Context) {
-	username := strings.TrimSpace(c.Query("username"))
-	password := strings.TrimSpace(c.Query("password"))
+	username := strings.TrimSpace(c.PostForm("username"))
+	password := strings.TrimSpace(c.PostForm("password"))
 	json := utils.JsonResponse{}
 	var result string
 	if username == "" || password == "" {
