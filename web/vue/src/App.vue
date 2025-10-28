@@ -66,9 +66,17 @@ body {
   height: 100%;
 }
 .custom-message-box {
-  min-width: 400px;
+  min-width: 420px;
 }
 .custom-message-box .el-message-box__message {
-  font-size: 16px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.el-message-box {
+  max-width: 500px;
+}
+.el-message-box__title {
+  font-size: 18px;
+  font-weight: 600;
 }
 </style>

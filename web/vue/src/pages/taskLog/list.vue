@@ -138,7 +138,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-dialog title="任务执行结果" :visible.sync="dialogVisible">
+      <el-dialog title="任务执行结果" v-model="dialogVisible" width="60%">
         <div>
           <pre>{{currentTaskResult.command}}</pre>
         </div>
@@ -151,6 +151,7 @@
 </template>
 
 <script>
+import { ElMessageBox } from 'element-plus'
 import taskSidebar from '../task/sidebar.vue'
 import taskLogService from '../../api/taskLog'
 import { useUserStore } from '../../stores/user'
@@ -238,12 +239,17 @@ export default {
       })
     },
     clearLog () {
-      this.$appConfirm(() => {
+      ElMessageBox.confirm('确定清空所有日志?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        center: true
+      }).then(() => {
         taskLogService.clear(() => {
           this.searchParams.page = 1
           this.search()
         })
-      })
+      }).catch(() => {})
     },
     stopTask (item) {
       taskLogService.stop(item.id, item.task_id, () => {

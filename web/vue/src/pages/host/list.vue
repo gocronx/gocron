@@ -54,7 +54,7 @@
           label="端口">
         </el-table-column>
         <el-table-column label="查看任务">
-          <template slot-scope="scope">
+          <template #default="scope">
             <el-button type="success" @click="toTasks(scope.row)">查看任务</el-button>
           </template>
         </el-table-column>
@@ -63,7 +63,7 @@
           label="备注">
         </el-table-column>
         <el-table-column label="操作" width="300" v-if="this.isAdmin">
-          <template slot-scope="scope">
+          <template #default="scope">
             <el-row>
               <el-button type="primary" @click="toEdit(scope.row)">编辑</el-button>
               <el-button type="info" @click="ping(scope.row)">测试连接</el-button>
@@ -78,6 +78,7 @@
 </template>
 
 <script>
+import { ElMessageBox } from 'element-plus'
 import hostService from '../../api/host'
 import { useUserStore } from '../../stores/user'
 
@@ -120,9 +121,14 @@ export default {
       })
     },
     remove (item) {
-      this.$appConfirm(() => {
+      ElMessageBox.confirm('确定删除此节点?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        center: true
+      }).then(() => {
         hostService.remove(item.id, () => this.refresh())
-      })
+      }).catch(() => {})
     },
     ping (item) {
       hostService.ping(item.id, () => {

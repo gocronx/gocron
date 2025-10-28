@@ -37,8 +37,8 @@ axios.interceptors.response.use(data => {
   return Promise.reject(error)
 })
 
-function handle (promise, next) {
-  promise.then((res) => successCallback(res, next))
+function handle (promise, next, errorCallback) {
+  promise.then((res) => successCallback(res, next, errorCallback))
     .catch((error) => failureCallback(error))
 }
 
@@ -63,9 +63,15 @@ function checkResponseCode (code, msg) {
   return true
 }
 
-function successCallback (res, next) {
-  if (!checkResponseCode(res.data.code, res.data.message)) {
-    return
+function successCallback (res, next, errorCallback) {
+  if (res.data.code !== SUCCESS_CODE) {
+    if (errorCallback) {
+      errorCallback(res.data.code, res.data.message)
+      return
+    }
+    if (!checkResponseCode(res.data.code, res.data.message)) {
+      return
+    }
   }
   if (!next) {
     return
@@ -107,12 +113,12 @@ export default {
     }).catch((error) => failureCallback(error))
   },
 
-  post (uri, data, next) {
+  post (uri, data, next, errorCallback) {
     const promise = axios.post(uri, qs.stringify(data), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
     })
-    handle(promise, next)
+    handle(promise, next, errorCallback)
   }
 }

@@ -2,7 +2,7 @@
   "name": "gocron",
   "version": "2.0.0",
   "description": "定时任务管理系统",
-  "author": "ouqiang <qingqianludao@gmail.com>",
+  "author": "gocronx <gocronx@gmail.com>",
   "private": true,
   "type": "module",
   "scripts": {

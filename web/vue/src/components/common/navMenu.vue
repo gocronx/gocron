@@ -11,20 +11,15 @@
       <el-menu-item index="/host">任务节点</el-menu-item>
       <el-menu-item v-if="userStore.isAdmin" index="/user">用户管理</el-menu-item>
       <el-menu-item v-if="userStore.isAdmin" index="/system">系统管理</el-menu-item>
-      <div style="flex: 1;"></div>
-      <el-dropdown v-if="userStore.token" trigger="click" style="margin-left: auto;">
-        <span style="color: #fff; cursor: pointer; padding: 0 20px; line-height: 60px;">
-          {{ userStore.username || '用户' }}
-          <el-icon style="margin-left: 5px;"><arrow-down /></el-icon>
-        </span>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item @click="$router.push('/user/edit-my-password')">修改密码</el-dropdown-item>
-            <el-dropdown-item @click="$router.push('/user/two-factor')">双因素认证</el-dropdown-item>
-            <el-dropdown-item divided @click="logout">退出</el-dropdown-item>
-          </el-dropdown-menu>
+      <el-sub-menu v-if="userStore.isLogin" index="user-menu" style="margin-left: auto;">
+        <template #title>
+          <el-icon><User /></el-icon>
+          <span>{{ userStore.username || '用户' }}</span>
         </template>
-      </el-dropdown>
+        <el-menu-item @click="$router.push('/user/edit-my-password')">修改密码</el-menu-item>
+        <el-menu-item @click="$router.push('/user/two-factor')">双因素认证</el-menu-item>
+        <el-menu-item @click="logout">退出</el-menu-item>
+      </el-sub-menu>
     </el-menu>
   </div>
 </template>
@@ -33,7 +28,7 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '../../stores/user'
-import { ArrowDown } from '@element-plus/icons-vue'
+import { ArrowDown, User } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()

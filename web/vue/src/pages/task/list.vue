@@ -185,6 +185,7 @@
 import taskSidebar from './sidebar.vue'
 import taskService from '../../api/task'
 import { useUserStore } from '../../stores/user'
+import { ElMessageBox, ElMessage } from 'element-plus'
 
 export default {
   name: 'task-list',
@@ -284,25 +285,38 @@ export default {
       })
     },
     runTask (item) {
-      this.$appConfirm(() => {
+      ElMessageBox.confirm(
+        `确定要手动执行任务 "${item.name}" 吗？`,
+        '手动执行任务',
+        {
+          confirmButtonText: '确定执行',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(() => {
         taskService.run(item.id, () => {
-          this.$message.success('任务已开始执行')
+          ElMessage.success('任务已开始执行')
         })
-      })
+      }).catch(() => {})
     },
     remove (item) {
-      this.$appConfirm(() => {
+      ElMessageBox.confirm('确定删除此任务?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        center: true
+      }).then(() => {
         taskService.remove(item.id, () => {
           this.refresh()
         })
-      })
+      }).catch(() => {})
     },
     jumpToLog (item) {
       this.$router.push(`/task/log?task_id=${item.id}`)
     },
     refresh () {
       this.search(() => {
-        this.$message.success('刷新成功')
+        ElMessage.success('刷新成功')
       })
     },
     toEdit (item) {

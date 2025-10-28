@@ -13,12 +13,12 @@ export default {
     httpClient.post('/user/store', data, callback)
   },
 
-  login (username, password, twoFactorCode, callback) {
+  login (username, password, twoFactorCode, callback, errorCallback) {
     const data = { username, password }
     if (twoFactorCode) {
       data.two_factor_code = twoFactorCode
     }
-    httpClient.post('/user/login', data, callback)
+    httpClient.post('/user/login', data, callback, errorCallback)
   },
 
   enable (id, callback) {
