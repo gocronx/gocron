@@ -1,9 +1,11 @@
 <template>
   <div class="two-factor-container">
     <el-card class="box-card">
-      <div slot="header" class="clearfix">
-        <span>双因素认证 (2FA)</span>
-      </div>
+      <template #header>
+        <div class="clearfix">
+          <span>双因素认证 (2FA)</span>
+        </div>
+      </template>
       
       <div v-if="!twoFactorEnabled">
         <el-alert
@@ -43,7 +45,7 @@
 
     <el-dialog
       title="启用双因素认证"
-      :visible.sync="setupDialogVisible"
+      v-model="setupDialogVisible"
       width="500px"
       :close-on-click-modal="false">
       
@@ -67,15 +69,17 @@
         </el-input>
       </div>
 
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="setupDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="enable2FA" :loading="loading">确定</el-button>
-      </span>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="setupDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="enable2FA" :loading="loading">确定</el-button>
+        </span>
+      </template>
     </el-dialog>
 
     <el-dialog
       title="禁用双因素认证"
-      :visible.sync="disableDialogVisible"
+      v-model="disableDialogVisible"
       width="400px"
       :close-on-click-modal="false">
       
@@ -87,10 +91,12 @@
         @keyup.enter.native="disable2FA">
       </el-input>
 
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="disableDialogVisible = false">取消</el-button>
-        <el-button type="danger" @click="disable2FA" :loading="loading">确定禁用</el-button>
-      </span>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="disableDialogVisible = false">取消</el-button>
+          <el-button type="danger" @click="disable2FA" :loading="loading">确定禁用</el-button>
+        </span>
+      </template>
     </el-dialog>
   </div>
 </template>
@@ -165,6 +171,9 @@ export default {
         this.disableDialogVisible = false
         this.twoFactorEnabled = false
         this.disableCode = ''
+        this.loading = false
+      }, (code, msg) => {
+        this.$message.error(msg || '禁用2FA失败')
         this.loading = false
       })
     },

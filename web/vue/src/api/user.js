@@ -56,7 +56,7 @@ export default {
     httpClient.post('/user/2fa/enable', { secret, code }, callback)
   },
 
-  disable2FA (code, callback) {
-    httpClient.post('/user/2fa/disable', { code }, callback)
+  disable2FA (code, callback, errorCallback) {
+    httpClient.post('/user/2fa/disable', { code }, callback, errorCallback)
   }
 }
