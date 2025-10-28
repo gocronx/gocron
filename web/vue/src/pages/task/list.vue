@@ -3,19 +3,19 @@
   <task-sidebar></task-sidebar>
   <el-main>
     <el-form :inline="true">
-      <el-form-item label="任务ID">
+      <el-form-item :label="t('task.id')">
         <el-input v-model.trim="searchParams.id" style="width: 180px;"></el-input>
       </el-form-item>
-      <el-form-item label="任务名称">
+      <el-form-item :label="t('task.name')">
         <el-input v-model.trim="searchParams.name" style="width: 180px;"></el-input>
       </el-form-item>
-      <el-form-item label="标签">
+      <el-form-item :label="t('task.tag')">
         <el-input v-model.trim="searchParams.tag" style="width: 180px;"></el-input>
       </el-form-item>
       <br>
-      <el-form-item label="执行方式">
+      <el-form-item :label="t('task.protocol')">
         <el-select v-model.trim="searchParams.protocol" style="width: 180px;">
-          <el-option label="全部" value=""></el-option>
+          <el-option :label="t('select')" value=""></el-option>
           <el-option
             v-for="item in protocolList"
             :key="item.value"
@@ -24,9 +24,9 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="任务节点">
+      <el-form-item :label="t('task.taskNode')">
         <el-select v-model.trim="searchParams.host_id" style="width: 180px;">
-          <el-option label="全部" value=""></el-option>
+          <el-option :label="t('select')" value=""></el-option>
           <el-option
             v-for="item in hosts"
             :key="item.id"
@@ -35,9 +35,9 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="状态">
+      <el-form-item :label="t('common.status')">
         <el-select v-model.trim="searchParams.status" style="width: 180px;">
-          <el-option label="全部" value=""></el-option>
+          <el-option :label="t('select')" value=""></el-option>
           <el-option
             v-for="item in statusList"
             :key="item.value"
@@ -47,7 +47,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="search()">搜索</el-button>
+        <el-button type="primary" @click="search()">{{ t('common.search') }}</el-button>
       </el-form-item>
     </el-form>
     <el-row type="flex" justify="end" style="margin-bottom: 10px;">
@@ -56,8 +56,8 @@
         <el-button v-if="isAdmin" type="success" size="default" @click="batchEnable" :disabled="selectedTasks.length === 0">批量启用</el-button>
         <el-button v-if="isAdmin" type="warning" size="default" @click="batchDisable" :disabled="selectedTasks.length === 0">批量禁用</el-button>
         <el-button v-if="isAdmin" type="danger" size="default" @click="batchRemove" :disabled="selectedTasks.length === 0">批量删除</el-button>
-        <el-button type="primary" @click="toEdit(null)" v-if="isAdmin">新增</el-button>
-        <el-button type="info" @click="refresh">刷新</el-button>
+        <el-button type="primary" @click="toEdit(null)" v-if="isAdmin">{{ t('common.add') }}</el-button>
+        <el-button type="info" @click="refresh">{{ t('common.refresh') }}</el-button>
       </el-col>
     </el-row>
     <el-pagination
@@ -113,23 +113,23 @@
       </el-table-column>
       <el-table-column
         prop="id"
-        label="任务ID">
+        :label="t('task.id')">
       </el-table-column>
       <el-table-column
         prop="name"
-        label="任务名称"
+        :label="t('task.name')"
       width="150">
       </el-table-column>
       <el-table-column
         prop="tag"
-        label="标签">
+        :label="t('task.tag')">
       </el-table-column>
       <el-table-column
         prop="spec"
-        label="cron表达式"
+        :label="t('task.cronExpression')"
       width="120">
       </el-table-column>
-      <el-table-column label="下次执行时间" width="160">
+      <el-table-column :label="t('task.nextRunTime')" width="160">
         <template #default="scope">
           {{ $filters.formatTime(scope.row.next_run_time) }}
         </template>
@@ -137,10 +137,10 @@
       <el-table-column
         prop="protocol"
         :formatter="formatProtocol"
-        label="执行方式">
+        :label="t('task.protocol')">
       </el-table-column>
       <el-table-column
-        label="状态" v-if="isAdmin">
+        :label="t('common.status')" v-if="isAdmin">
           <template #default="scope">
             <el-switch
               v-if="scope.row.level === 1"
@@ -153,7 +153,7 @@
             </el-switch>
           </template>
       </el-table-column>
-      <el-table-column label="状态" v-else>
+      <el-table-column :label="t('common.status')" v-else>
         <template #default="scope">
           <el-switch
             v-if="scope.row.level === 1"
@@ -166,16 +166,16 @@
           </el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="220" v-if="isAdmin">
+      <el-table-column :label="t('common.operation')" width="220" v-if="isAdmin">
         <template #default="scope">
           <el-row>
-            <el-button type="primary" @click="toEdit(scope.row)">编辑</el-button>
-            <el-button type="success" @click="runTask(scope.row)">手动执行</el-button>
+            <el-button type="primary" @click="toEdit(scope.row)">{{ t('common.edit') }}</el-button>
+            <el-button type="success" @click="runTask(scope.row)">{{ t('task.manualRun') }}</el-button>
           </el-row>
           <br>
           <el-row>
-            <el-button type="info" @click="jumpToLog(scope.row)">查看日志</el-button>
-            <el-button type="danger" @click="remove(scope.row)">删除</el-button>
+            <el-button type="info" @click="jumpToLog(scope.row)">{{ t('task.viewLog') }}</el-button>
+            <el-button type="danger" @click="remove(scope.row)">{{ t('common.delete') }}</el-button>
           </el-row>
         </template>
       </el-table-column>
@@ -185,6 +185,7 @@
 </template>
 
 <script>
+import { useI18n } from 'vue-i18n'
 import taskSidebar from './sidebar.vue'
 import taskService from '../../api/task'
 import { useUserStore } from '../../stores/user'
@@ -192,6 +193,10 @@ import { ElMessageBox } from 'element-plus'
 
 export default {
   name: 'task-list',
+  setup() {
+    const { t } = useI18n()
+    return { t }
+  },
   data () {
     const userStore = useUserStore()
     return {

@@ -2,31 +2,29 @@
   <el-container >
     <task-sidebar></task-sidebar>
     <el-main>
-      <el-form ref="form" :model="form" :rules="formRules" label-width="180px">
+      <el-form ref="form" :model="form" :rules="formRules" :label-width="locale === 'zh-CN' ? '180px' : '220px'">
         <el-input v-model="form.id" type="hidden"></el-input>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="任务名称" prop="name">
+            <el-form-item :label="t('task.name')" prop="name">
               <el-input v-model.trim="form.name"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="标签">
-              <el-input v-model.trim="form.tag" placeholder="通过标签将任务分组"></el-input>
+            <el-form-item :label="t('task.tag')">
+              <el-input v-model.trim="form.tag" :placeholder="t('task.tagPlaceholder')"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row v-if="form.level === 1">
           <el-col>
             <el-alert
-              title="主任务可以配置多个子任务, 当主任务执行完成后，自动执行子任务
-任务类型新增后不能变更"
+              :title="t('task.mainTaskTip')"
               type="info"
               :closable="false">
             </el-alert>
             <el-alert
-              title="强依赖: 主任务执行成功，才会运行子任务
-弱依赖: 无论主任务执行是否成功，都会运行子任务"
+              :title="t('task.dependencyTip')"
               type="info"
               :closable="false">
             </el-alert> <br>
@@ -34,7 +32,7 @@
         </el-row>
         <el-row>
           <el-col :span="7">
-            <el-form-item label="任务类型">
+            <el-form-item :label="t('task.type')">
               <el-select v-model.trim="form.level" :disabled="form.id !== '' ">
                 <el-option
                   v-for="item in levelList"
@@ -46,7 +44,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="7" v-if="form.level === 1">
-            <el-form-item label="依赖关系">
+            <el-form-item :label="t('task.dependency')">
               <el-select v-model.trim="form.dependency_status">
                 <el-option
                   v-for="item in dependencyStatusList"
@@ -58,33 +56,33 @@
             </el-form-item>
           </el-col>
           <el-col :span="10">
-            <el-form-item label="子任务ID" v-if="form.level === 1">
-              <el-input v-model.trim="form.dependency_task_id" placeholder="多个ID逗号分隔"></el-input>
+            <el-form-item :label="t('task.childTaskId')" v-if="form.level === 1">
+              <el-input v-model.trim="form.dependency_task_id" :placeholder="t('task.childTaskIdPlaceholder')"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row v-if="form.level === 1">
           <el-col :span="12">
-            <el-form-item label="crontab表达式" prop="spec">
+            <el-form-item :label="t('task.cronExpression')" prop="spec">
               <el-input v-model.trim="form.spec"
-                        placeholder="秒 分 时 天 月 周">
+                        :placeholder="t('task.cronPlaceholder')">
                 <template #append>
                   <el-popover
                     placement="bottom"
                     :width="500"
                     trigger="click">
                     <template #reference>
-                      <el-button>示例</el-button>
+                      <el-button>{{ t('task.cronExample') }}</el-button>
                     </template>
                     <div>
-                      <h4>标准语法（秒 分 时 天 月 周）</h4>
+                      <h4>{{ t('task.cronStandard') }}</h4>
                       <ul style="padding-left: 20px; margin: 10px 0;">
                         <li>0 * * * * * - 每分钟第0秒运行</li>
                         <li>*/20 * * * * * - 每隄20秒运行一次</li>
                         <li>0 30 21 * * * - 每天晚上21:30:00运行</li>
                         <li>0 0 23 * * 6 - 每周六晚上23:00:00运行</li>
                       </ul>
-                      <h4>快捷语法</h4>
+                      <h4>{{ t('task.cronShortcut') }}</h4>
                       <ul style="padding-left: 20px; margin: 10px 0;">
                         <li>@yearly - 每年运行一次</li>
                         <li>@monthly - 每月运行一次</li>
@@ -103,7 +101,7 @@
         </el-row>
         <el-row>
           <el-col :span="8">
-            <el-form-item label="执行方式">
+            <el-form-item :label="t('task.protocol')">
               <el-select v-model.trim="form.protocol" @change="handleProtocolChange">
                 <el-option
                   v-for="item in protocolList"
@@ -115,7 +113,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="8" v-if="form.protocol === 1 ">
-            <el-form-item label="请求方法">
+            <el-form-item :label="t('task.httpMethod')">
               <el-select key="http-method" v-model.trim="form.http_method">
                 <el-option
                   v-for="item in httpMethods"
@@ -127,13 +125,13 @@
             </el-form-item>
           </el-col>
           <el-col :span="8" v-else>
-            <el-form-item label="任务节点" prop="host_ids">
+            <el-form-item :label="t('task.taskNode')" prop="host_ids">
               <el-select
                 key="shell"
                 v-model="form.host_ids"
                 filterable
                 multiple
-                placeholder="请选择任务节点">
+                :placeholder="t('task.taskNodePlaceholder')">
                 <el-option
                   v-for="item in hosts"
                   :key="item.id"
@@ -146,7 +144,7 @@
         </el-row>
         <el-row>
           <el-col :span="16">
-            <el-form-item label="命令" prop="command">
+            <el-form-item :label="t('task.command')" prop="command">
               <el-input
                 type="textarea"
                 :rows="5"
@@ -159,12 +157,12 @@
         <el-row>
           <el-col>
             <el-alert
-              title="任务执行超时强制结束, 取值0-86400(秒), 默认0, 不限制"
+              :title="t('task.timeoutTip')"
               type="info"
               :closable="false">
             </el-alert>
             <el-alert
-              title="单实例运行, 前次任务未执行完成，下次任务调度时间到了是否要执行, 即是否允许多进程执行同一任务"
+              :title="t('task.singleInstanceTip')"
               type="info"
               :closable="false">
             </el-alert> <br>
@@ -172,12 +170,12 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="任务超时时间" prop="timeout">
+            <el-form-item :label="t('task.timeout')" prop="timeout">
               <el-input v-model.number.trim="form.timeout"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="单实例运行">
+            <el-form-item :label="t('task.singleInstance')">
               <el-select v-model.trim="form.multi">
                 <el-option
                   v-for="item in runStatusList"
@@ -191,20 +189,20 @@
         </el-row>
         <el-row>
         <el-col :span="12">
-          <el-form-item label="任务失败重试次数" prop="retry_times">
+          <el-form-item :label="t('task.retryTimes')" prop="retry_times">
             <el-input v-model.number.trim="form.retry_times"
-                      placeholder="0 - 10, 默认0，不重试"></el-input>
+                      :placeholder="t('task.retryTimesPlaceholder')"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="任务失败重试间隔时间" prop="retry_interval">
-            <el-input v-model.number.trim="form.retry_interval" placeholder="0 - 3600 (秒), 默认0，执行系统默认策略"></el-input>
+          <el-form-item :label="t('task.retryInterval')" prop="retry_interval">
+            <el-input v-model.number.trim="form.retry_interval" :placeholder="t('task.retryIntervalPlaceholder')"></el-input>
           </el-form-item>
         </el-col>
         </el-row>
         <el-row>
           <el-col :span="8">
-            <el-form-item label="任务通知">
+            <el-form-item :label="t('task.notification')">
               <el-select v-model.trim="form.notify_status">
                 <el-option
                   v-for="item in notifyStatusList"
@@ -216,7 +214,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="8" v-if="form.notify_status !== 1">
-            <el-form-item label="通知类型">
+            <el-form-item :label="t('task.notifyType')">
               <el-select v-model.trim="form.notify_type">
                 <el-option
                   v-for="item in notifyTypes"
@@ -230,8 +228,8 @@
           </el-col>
           <el-col :span="8"
                   v-if="form.notify_status !== 1 && form.notify_type === 2">
-            <el-form-item label="接收用户">
-              <el-select key="notify-mail" v-model="selectedMailNotifyIds" filterable multiple placeholder="请选择">
+            <el-form-item :label="t('task.notifyReceiver')">
+              <el-select key="notify-mail" v-model="selectedMailNotifyIds" filterable multiple :placeholder="t('task.notifyReceiverPlaceholder')">
                 <el-option
                   v-for="item in mailUsers"
                   :key="item.id"
@@ -244,8 +242,8 @@
 
           <el-col :span="8"
                   v-if="form.notify_status !== 1 && form.notify_type === 3">
-            <el-form-item label="发送Channel">
-              <el-select key="notify-slack" v-model="selectedSlackNotifyIds" filterable multiple placeholder="请选择">
+            <el-form-item :label="t('task.notifyChannel')">
+              <el-select key="notify-slack" v-model="selectedSlackNotifyIds" filterable multiple :placeholder="t('task.notifyReceiverPlaceholder')">
                 <el-option
                   v-for="item in slackChannels"
                   :key="item.id"
@@ -259,14 +257,14 @@
         </el-row>
         <el-row v-if="form.notify_status === 4">
           <el-col :span="12">
-            <el-form-item label="任务执行输出关键字" prop="notify_keyword">
-              <el-input v-model.trim="form.notify_keyword" placeholder="任务执行输出中包含此关键字将触发通知"></el-input>
+            <el-form-item :label="t('task.notifyKeyword')" prop="notify_keyword">
+              <el-input v-model.trim="form.notify_keyword" :placeholder="t('task.notifyKeywordPlaceholder')"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="16">
-            <el-form-item label="备注">
+            <el-form-item :label="t('task.remark')">
               <el-input
                 type="textarea"
                 :rows="3"
@@ -276,8 +274,8 @@
           </el-col>
         </el-row>
         <el-form-item>
-          <el-button type="primary" @click="submit">保存</el-button>
-          <el-button @click="cancel">取消</el-button>
+          <el-button type="primary" @click="submit">{{ t('common.save') }}</el-button>
+          <el-button @click="cancel">{{ t('common.cancel') }}</el-button>
         </el-form-item>
       </el-form>
     </el-main>
@@ -286,6 +284,7 @@
 
 
 <script>
+import { useI18n } from 'vue-i18n'
 import taskSidebar from './sidebar.vue'
 import taskService from '../../api/task'
 import notificationService from '../../api/notification'
@@ -318,6 +317,10 @@ const createDefaultForm = () => ({
 export default {
   name: 'task-edit',
   components: {taskSidebar},
+  setup() {
+    const { t, locale } = useI18n()
+    return { t, locale }
+  },
   data () {
     return {
       form: createDefaultForm(),

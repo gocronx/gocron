@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="用户登录"
+    :title="t('login.title')"
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :show-close="false"
@@ -13,29 +13,36 @@
       :closable="false"
       style="margin-bottom: 20px;"
     />
-    <el-form ref="formRef" :model="form" label-width="80px" :rules="formRules">
-      <el-form-item label="用户名" prop="username">
-        <el-input v-model.trim="form.username" placeholder="请输入用户名或邮箱" />
+    <el-form ref="formRef" :model="form" :label-width="locale === 'zh-CN' ? '80px' : '150px'" :rules="formRules">
+      <el-form-item :label="t('login.username')" prop="username">
+        <el-input v-model.trim="form.username" :placeholder="t('login.usernamePlaceholder')" />
       </el-form-item>
-      <el-form-item label="密码" prop="password">
-        <el-input v-model.trim="form.password" type="password" placeholder="请输入密码" @keyup.enter="submit" />
+      <el-form-item :label="t('login.password')" prop="password">
+        <el-input v-model.trim="form.password" type="password" :placeholder="t('login.passwordPlaceholder')" @keyup.enter="submit" />
       </el-form-item>
-      <el-form-item label="验证码" prop="twoFactorCode" v-if="require2FA">
-        <el-input v-model.trim="form.twoFactorCode" placeholder="请输入6位验证码" maxlength="6" @keyup.enter="submit" />
+      <el-form-item :label="t('login.verifyCode')" prop="twoFactorCode" v-if="require2FA">
+        <el-input v-model.trim="form.twoFactorCode" :placeholder="t('login.verifyCodePlaceholder')" maxlength="6" @keyup.enter="submit" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submit" :loading="loading" style="width: 100%;">登录</el-button>
+        <el-button type="primary" @click="submit" :loading="loading" style="width: 100%;">{{ t('login.login') }}</el-button>
       </el-form-item>
     </el-form>
+    <div style="text-align: center; margin-top: 10px;">
+      <LanguageSwitcher />
+    </div>
   </el-dialog>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useUserStore } from '../../stores/user'
 import { useLoading } from '../../composables/useLoading'
 import userService from '../../api/user'
+import LanguageSwitcher from '../../components/common/LanguageSwitcher.vue'
+
+const { t, locale } = useI18n()
 
 const router = useRouter()
 const route = useRoute()
@@ -53,11 +60,11 @@ const form = reactive({
   twoFactorCode: ''
 })
 
-const formRules = {
-  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-  twoFactorCode: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
-}
+const formRules = computed(() => ({
+  username: [{ required: true, message: t('login.usernameRequired'), trigger: 'blur' }],
+  password: [{ required: true, message: t('login.passwordRequired'), trigger: 'blur' }],
+  twoFactorCode: [{ required: true, message: t('login.verifyCodeRequired'), trigger: 'blur' }]
+}))
 
 const submit = async () => {
   if (!formRef.value) return
