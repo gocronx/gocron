@@ -84,6 +84,8 @@ func Register(r *gin.Engine) {
 		taskGroup.POST("/remove/:id", task.Remove)
 		taskGroup.POST("/enable/:id", task.Enable)
 		taskGroup.POST("/disable/:id", task.Disable)
+		taskGroup.POST("/batch-enable", task.BatchEnable)
+		taskGroup.POST("/batch-disable", task.BatchDisable)
 		taskGroup.GET("/run/:id", task.Run)
 	}
 

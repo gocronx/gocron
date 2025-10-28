@@ -39,5 +39,13 @@ export default {
 
   run (id, callback) {
     httpClient.get(`/task/run/${id}`, { _t: Date.now() }, callback)
+  },
+
+  batchEnable (ids, callback) {
+    httpClient.postJson('/task/batch-enable', { ids }, callback)
+  },
+
+  batchDisable (ids, callback) {
+    httpClient.postJson('/task/batch-disable', { ids }, callback)
   }
 }

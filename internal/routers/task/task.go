@@ -269,6 +269,52 @@ func Run(c *gin.Context) {
 	c.String(http.StatusOK, result)
 }
 
+// 批量启用任务
+func BatchEnable(c *gin.Context) {
+	batchChangeStatus(c, models.Enabled)
+}
+
+// 批量禁用任务
+func BatchDisable(c *gin.Context) {
+	batchChangeStatus(c, models.Disabled)
+}
+
+// 批量改变任务状态
+func batchChangeStatus(c *gin.Context, status models.Status) {
+	var form struct {
+		Ids []int `json:"ids" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&form); err != nil {
+		json := utils.JsonResponse{}
+		result := json.CommonFailure("参数错误")
+		c.String(http.StatusOK, result)
+		return
+	}
+
+	json := utils.JsonResponse{}
+	taskModel := new(models.Task)
+	successCount := 0
+	for _, id := range form.Ids {
+		_, err := taskModel.Update(id, models.CommonMap{
+			"status": status,
+		})
+		if err == nil {
+			successCount++
+			if status == models.Enabled {
+				addTaskToTimer(id)
+			} else {
+				service.ServiceTask.Remove(id)
+			}
+		}
+	}
+
+	result := json.Success("操作成功", map[string]interface{}{
+		"success_count": successCount,
+		"total_count":   len(form.Ids),
+	})
+	c.String(http.StatusOK, result)
+}
+
 // 改变任务状态
 func changeStatus(c *gin.Context, status models.Status) {
 	id, _ := strconv.Atoi(c.Param("id"))

@@ -120,5 +120,14 @@ export default {
       }
     })
     handle(promise, next, errorCallback)
+  },
+
+  postJson (uri, data, next, errorCallback) {
+    const promise = axios.post(uri, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    handle(promise, next, errorCallback)
   }
 }

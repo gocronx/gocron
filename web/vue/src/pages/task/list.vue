@@ -50,11 +50,12 @@
         <el-button type="primary" @click="search()">搜索</el-button>
       </el-form-item>
     </el-form>
-    <el-row type="flex" justify="end">
-      <el-col :span="2">
+    <el-row type="flex" justify="end" style="margin-bottom: 10px;">
+      <el-col :span="24" style="text-align: right;">
+        <span v-if="isAdmin && selectedTasks.length > 0" style="margin-right: 10px; color: #909399;">已选择 {{ selectedTasks.length }} 个任务</span>
+        <el-button v-if="isAdmin" type="success" size="default" @click="batchEnable" :disabled="selectedTasks.length === 0">批量启用</el-button>
+        <el-button v-if="isAdmin" type="warning" size="default" @click="batchDisable" :disabled="selectedTasks.length === 0">批量禁用</el-button>
         <el-button type="primary" @click="toEdit(null)" v-if="isAdmin">新增</el-button>
-      </el-col>
-      <el-col :span="2">
         <el-button type="info" @click="refresh">刷新</el-button>
       </el-col>
     </el-row>
@@ -71,7 +72,9 @@
       :data="tasks"
       tooltip-effect="dark"
       border
+      @selection-change="handleSelectionChange"
       style="width: 100%">
+      <el-table-column type="selection" width="55" v-if="isAdmin"></el-table-column>
       <el-table-column type="expand">
         <template #default="scope">
           <el-form label-position="left" inline class="demo-table-expand">
@@ -195,6 +198,7 @@ export default {
       hosts: [],
       taskTotal: 0,
       isFirstActivate: true,
+      selectedTasks: [],
       searchParams: {
         page_size: 20,
         page: 1,
@@ -338,6 +342,53 @@ export default {
         path = `/task/edit/${item.id}`
       }
       this.$router.push(path)
+    },
+    handleSelectionChange (selection) {
+      this.selectedTasks = selection.filter(task => task.level === 1)
+    },
+    batchEnable () {
+      if (this.selectedTasks.length === 0) {
+        this.$message.warning('请选择要启用的任务')
+        return
+      }
+      ElMessageBox.confirm(
+        `确定要启用选中的 ${this.selectedTasks.length} 个任务吗？`,
+        '批量启用任务',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(() => {
+        const ids = this.selectedTasks.map(task => task.id)
+        taskService.batchEnable(ids, () => {
+          this.$message.success('批量启用成功')
+          this.selectedTasks = []
+          this.search()
+        })
+      }).catch(() => {})
+    },
+    batchDisable () {
+      if (this.selectedTasks.length === 0) {
+        this.$message.warning('请选择要禁用的任务')
+        return
+      }
+      ElMessageBox.confirm(
+        `确定要禁用选中的 ${this.selectedTasks.length} 个任务吗？`,
+        '批量禁用任务',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(() => {
+        const ids = this.selectedTasks.map(task => task.id)
+        taskService.batchDisable(ids, () => {
+          this.$message.success('批量禁用成功')
+          this.selectedTasks = []
+          this.search()
+        })
+      }).catch(() => {})
     }
   }
 }
