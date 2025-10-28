@@ -67,7 +67,37 @@
           <el-col :span="12">
             <el-form-item label="crontab表达式" prop="spec">
               <el-input v-model.trim="form.spec"
-                        placeholder="秒 分 时 天 月 周"></el-input>
+                        placeholder="秒 分 时 天 月 周">
+                <template #append>
+                  <el-popover
+                    placement="bottom"
+                    :width="500"
+                    trigger="click">
+                    <template #reference>
+                      <el-button>示例</el-button>
+                    </template>
+                    <div>
+                      <h4>标准语法（秒 分 时 天 月 周）</h4>
+                      <ul style="padding-left: 20px; margin: 10px 0;">
+                        <li>0 * * * * * - 每分钟第0秒运行</li>
+                        <li>*/20 * * * * * - 每隄20秒运行一次</li>
+                        <li>0 30 21 * * * - 每天晚上21:30:00运行</li>
+                        <li>0 0 23 * * 6 - 每周六晚上23:00:00运行</li>
+                      </ul>
+                      <h4>快捷语法</h4>
+                      <ul style="padding-left: 20px; margin: 10px 0;">
+                        <li>@yearly - 每年运行一次</li>
+                        <li>@monthly - 每月运行一次</li>
+                        <li>@weekly - 每周运行一次</li>
+                        <li>@daily - 每天运行一次</li>
+                        <li>@hourly - 每小时运行一次</li>
+                        <li>@every 30s - 每隄30秒运行一次</li>
+                        <li>@every 1m20s - 每隔1分钟20秒运行一次</li>
+                      </ul>
+                    </div>
+                  </el-popover>
+                </template>
+              </el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -259,6 +289,7 @@
 import taskSidebar from './sidebar.vue'
 import taskService from '../../api/task'
 import notificationService from '../../api/notification'
+import { validateCronSpec, getCronExamples } from '../../utils/cronValidator'
 
 const createDefaultForm = () => ({
   id: '',
@@ -500,38 +531,9 @@ export default {
         callback()
         return
       }
-      const specValue = value ? value.trim() : ''
-      if (!specValue) {
-        callback(new Error('请输入crontab表达式'))
-        return
-      }
-      const segments = specValue.split(/\s+/)
-      if (segments.length !== 6) {
-        callback(new Error('crontab表达式需包含6段（秒 分 时 日 月 周）'))
-        return
-      }
-      const allowedPattern = /^[0-9A-Za-z*\/,\-?#]+$/
-      const numericRanges = [
-        { min: 0, max: 59 },
-        { min: 0, max: 59 },
-        { min: 0, max: 23 },
-        { min: 1, max: 31 },
-        { min: 1, max: 12 },
-        { min: 0, max: 7 }
-      ]
-      const invalid = segments.some((part, index) => {
-        if (!allowedPattern.test(part)) {
-          return true
-        }
-        if (/^\d+$/.test(part)) {
-          const num = Number(part)
-          const { min, max } = numericRanges[index]
-          return Number.isNaN(num) || num < min || num > max
-        }
-        return false
-      })
-      if (invalid) {
-        callback(new Error('crontab表达式格式不正确，请检查输入'))
+      const result = validateCronSpec(value)
+      if (!result.valid) {
+        callback(new Error(result.message))
         return
       }
       callback()

@@ -264,9 +264,13 @@ export default {
     },
     changeStatus (item) {
       if (item.status) {
-        taskService.enable(item.id)
+        taskService.enable(item.id, () => {
+          this.search()
+        })
       } else {
-        taskService.disable(item.id)
+        taskService.disable(item.id, () => {
+          this.search()
+        })
       }
     },
     formatProtocol (row, col) {
