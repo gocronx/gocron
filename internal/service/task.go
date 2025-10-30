@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gocronx-team/cron"
 	"github.com/gocronx-team/gocron/internal/models"
 	"github.com/gocronx-team/gocron/internal/modules/app"
 	"github.com/gocronx-team/gocron/internal/modules/httpclient"
@@ -17,7 +18,6 @@ import (
 	rpcClient "github.com/gocronx-team/gocron/internal/modules/rpc/client"
 	pb "github.com/gocronx-team/gocron/internal/modules/rpc/proto"
 	"github.com/gocronx-team/gocron/internal/modules/utils"
-	"github.com/jakecoffman/cron"
 )
 
 var (
