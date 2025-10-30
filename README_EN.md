@@ -25,13 +25,10 @@ A lightweight cron task management system developed in Go, designed to replace L
 
 Here are some partial screenshots of the system:
 
-### Scheduled Tasks
 ![Scheduled Tasks](assets/screenshot/scheduler_en.png)
 
-### Task Management
 ![Task Management](assets/screenshot/task_en.png)
 
-### System Notifications
 ![System Notifications](assets/screenshot/notification_en.png)
 
 

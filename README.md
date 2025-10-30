@@ -25,13 +25,10 @@
 
 以下是系统的部分界面截图：
 
-### 任务调度
 ![任务调度](assets/screenshot/scheduler.png)
 
-### 任务管理
 ![任务管理](assets/screenshot/task.png)
 
-### 系统通知
 ![系统通知](assets/screenshot/notification.png)
 
 
