@@ -111,15 +111,20 @@ jobs:
         echo "For detailed installation and configuration instructions, please refer to the [README](https://github.com/gocronx-team/gocron/blob/master/README.md)." >> release_notes.md
 
     - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        body_path: release_notes.md
-        files: |
-          gocron-package/*.tar.gz
-          gocron-package/*.zip
-          gocron-node-package/*.tar.gz
+      run: |
+        CURRENT_TAG=${GITHUB_REF#refs/tags/}
+        PRERELEASE_FLAG=""
+        if [[ "$CURRENT_TAG" == *"alpha"* ]] || [[ "$CURRENT_TAG" == *"beta"* ]] || [[ "$CURRENT_TAG" == *"rc"* ]]; then
+          PRERELEASE_FLAG="--prerelease"
+        fi
+        
+        gh release create "$CURRENT_TAG" \
+          --title "Release $CURRENT_TAG" \
+          --notes-file release_notes.md \
+          $PRERELEASE_FLAG \
+          gocron-package/*.tar.gz \
+          gocron-package/*.zip \
+          gocron-node-package/*.tar.gz \
           gocron-node-package/*.zip
-        draft: false
-        prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

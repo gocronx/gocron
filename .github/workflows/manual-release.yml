@@ -102,16 +102,19 @@ jobs:
         git push origin "${{ github.event.inputs.version }}"
 
     - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ github.event.inputs.version }}
-        body_path: release_notes.md
-        files: |
-          gocron-package/*.tar.gz
-          gocron-package/*.zip
-          gocron-node-package/*.tar.gz
+      run: |
+        PRERELEASE_FLAG=""
+        if [ "${{ github.event.inputs.prerelease }}" = "true" ]; then
+          PRERELEASE_FLAG="--prerelease"
+        fi
+        
+        gh release create "${{ github.event.inputs.version }}" \
+          --title "Release ${{ github.event.inputs.version }}" \
+          --notes-file release_notes.md \
+          $PRERELEASE_FLAG \
+          gocron-package/*.tar.gz \
+          gocron-package/*.zip \
+          gocron-node-package/*.tar.gz \
           gocron-node-package/*.zip
-        draft: false
-        prerelease: ${{ github.event.inputs.prerelease }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
