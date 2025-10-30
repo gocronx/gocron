@@ -1,5 +1,7 @@
 # gocron - 定时任务管理系统
 
+[![Release](https://img.shields.io/github/release/gocronx-team/gocron.svg?label=Release)](https://github.com/gocronx-team/gocron/releases) [![Downloads](https://img.shields.io/github/downloads/gocronx-team/gocron/total.svg)](https://github.com/gocronx-team/gocron/releases) [![License](https://img.shields.io/github/license/gocronx-team/gocron.svg)](https://github.com/gocronx-team/gocron/blob/master/LICENSE)
+
 [English](README_EN.md) | 简体中文
 
 使用Go语言开发的轻量级定时任务集中调度和管理系统，用于替代Linux-crontab。
@@ -266,7 +268,3 @@ refactor(api): 重构任务调度逻辑
 * 更好的用户体验和界面设计
 
 感谢原项目作者的付出，也希望大家多给项目点star、多提issue，鼓励项目的发展，让我们一起完善这个项目！
-
-## License
-
-MIT
