@@ -13,7 +13,7 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-row>
+        <el-row v-if="form.db_type !== 'sqlite'">
           <el-col :span="12">
             <el-form-item label="主机名" prop="db_host">
               <el-input v-model="form.db_host"></el-input>
@@ -25,7 +25,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row>
+        <el-row v-if="form.db_type !== 'sqlite'">
           <el-col :span="12">
             <el-form-item label="用户名" prop="db_username">
               <el-input v-model="form.db_username"></el-input>
@@ -39,8 +39,8 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="数据库名称" prop="db_name">
-              <el-input v-model="form.db_name" placeholder="如果数据库不存在, 需提前创建"></el-input>
+            <el-form-item :label="form.db_type === 'sqlite' ? '数据库文件路径' : '数据库名称'" prop="db_name">
+              <el-input v-model="form.db_name" :placeholder="form.db_type === 'sqlite' ? './data/gocron.db' : '如果数据库不存在, 需提前创建'"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -105,18 +105,6 @@ export default {
         db_type: [
           {required: true, message: '请选择数据库', trigger: 'blur'}
         ],
-        db_host: [
-          {required: true, message: '请输入数据库主机名', trigger: 'blur'}
-        ],
-        db_port: [
-          {type: 'number', required: true, message: '请输入数据库端口', trigger: 'blur'}
-        ],
-        db_username: [
-          {required: true, message: '请输入数据库用户名', trigger: 'blur'}
-        ],
-        db_password: [
-          {required: true, message: '请输入数据库密码', trigger: 'blur'}
-        ],
         db_name: [
           {required: true, message: '请输入数据库名称', trigger: 'blur'}
         ],
@@ -143,22 +131,53 @@ export default {
         {
           value: 'postgres',
           label: 'PostgreSql'
+        },
+        {
+          value: 'sqlite',
+          label: 'SQLite'
         }
       ],
       default_ports: {
         'mysql': 3306,
-        'postgres': 5432
+        'postgres': 5432,
+        'sqlite': 0
       }
     }
   },
   methods: {
     update_port (dbType) {
-      console.log(dbType)
-      console.log(this.default_ports[dbType])
       this.form['db_port'] = this.default_ports[dbType]
-      console.log(this.form['db_port'])
+      if (dbType === 'sqlite') {
+        this.form['db_host'] = ''
+        this.form['db_username'] = ''
+        this.form['db_password'] = ''
+        this.form['db_name'] = './data/gocron.db'
+      } else {
+        this.form['db_host'] = '127.0.0.1'
+        this.form['db_name'] = ''
+      }
     },
     submit () {
+      // 动态验证：非 SQLite 数据库需要验证主机名、端口、用户名和密码
+      if (this.form.db_type !== 'sqlite') {
+        if (!this.form.db_host) {
+          this.$message.error('请输入数据库主机名')
+          return
+        }
+        if (!this.form.db_port) {
+          this.$message.error('请输入数据库端口')
+          return
+        }
+        if (!this.form.db_username) {
+          this.$message.error('请输入数据库用户名')
+          return
+        }
+        if (!this.form.db_password) {
+          this.$message.error('请输入数据库密码')
+          return
+        }
+      }
+      
       this.$refs['form'].validate((valid) => {
         if (!valid) {
           return false

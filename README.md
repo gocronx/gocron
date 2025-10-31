@@ -54,6 +54,8 @@ go mod download
 
 # 3. 配置数据库
 # 编辑 ~/.gocron/conf/app.ini
+# MySQL/PostgreSQL 配置示例见项目根目录
+# SQLite 配置: 复制 app.ini.sqlite.example
 
 # 4. 启动后端（热更新）
 air

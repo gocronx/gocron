@@ -53,6 +53,8 @@ go mod download
 
 # 3. Configure database
 # Edit ~/.gocron/conf/app.ini
+# For MySQL/PostgreSQL: see examples in project root
+# For SQLite: copy app.ini.sqlite.example
 
 # 4. Start backend (with hot reload)
 air
