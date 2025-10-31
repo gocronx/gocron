@@ -8,9 +8,14 @@ RUN go mod download
 
 COPY . .
 
-RUN go install github.com/rakyll/statik@latest && \
-    go generate ./... && \
-    CGO_ENABLED=0 go build -ldflags="-s -w" -trimpath -o gocron ./cmd/gocron
+# Install statik separately to avoid concurrent build issues
+RUN go install github.com/rakyll/statik@latest
+
+# Generate static files
+RUN go generate ./...
+
+# Build with reduced parallelism for ARM64 stability
+RUN CGO_ENABLED=0 GOMAXPROCS=2 go build -ldflags="-s -w" -trimpath -o gocron ./cmd/gocron
 
 FROM scratch
 

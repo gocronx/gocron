@@ -8,7 +8,8 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 go build -ldflags="-s -w" -trimpath -o gocron-node ./cmd/node
+# Build with reduced parallelism for ARM64 stability
+RUN CGO_ENABLED=0 GOMAXPROCS=2 go build -ldflags="-s -w" -trimpath -o gocron-node ./cmd/node
 
 FROM scratch
 
