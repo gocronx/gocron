@@ -15,14 +15,14 @@ import (
 	"github.com/gocronx-team/gocron/internal/modules/app"
 	"github.com/gocronx-team/gocron/internal/modules/logger"
 	"github.com/gocronx-team/gocron/internal/modules/setting"
+	"github.com/gocronx-team/gocron/internal/modules/utils"
 	"github.com/gocronx-team/gocron/internal/routers"
 	"github.com/gocronx-team/gocron/internal/service"
-	"github.com/ouqiang/goutil"
 	"github.com/urfave/cli"
 )
 
 var (
-	AppVersion           = "1.5"
+	AppVersion           = "1.5.1"
 	BuildDate, GitCommit string
 )
 
@@ -33,7 +33,7 @@ func main() {
 	cliApp := cli.NewApp()
 	cliApp.Name = "gocron"
 	cliApp.Usage = "gocron service"
-	cliApp.Version, _ = goutil.FormatAppVersion(AppVersion, GitCommit, BuildDate)
+	cliApp.Version, _ = utils.FormatAppVersion(AppVersion, GitCommit, BuildDate)
 	cliApp.Commands = getCommands()
 	cliApp.Flags = append(cliApp.Flags, []cli.Flag{}...)
 	err := cliApp.Run(os.Args)

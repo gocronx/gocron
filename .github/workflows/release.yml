@@ -1,0 +1,101 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release'
+        required: true
+        default: 'v1.0.0'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.23'
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'yarn'
+        cache-dependency-path: web/vue/yarn.lock
+
+    - name: Install frontend dependencies
+      run: |
+        cd web/vue
+        yarn install --frozen-lockfile
+
+    - name: Build frontend
+      run: make build-vue
+
+    - name: Generate static assets
+      run: |
+        go install github.com/rakyll/statik@latest
+        go generate ./...
+
+    - name: Build packages for all platforms
+      run: |
+        chmod +x package.sh
+        bash ./package.sh -p "linux,darwin,windows" -a "amd64,arm64"
+
+    - name: Generate release notes
+      id: release_notes
+      run: |
+        # 获取当前tag和上一个tag
+        CURRENT_TAG=${GITHUB_REF#refs/tags/}
+        PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+        
+        # 生成变更日志
+        echo "## 🚀 What's New in $CURRENT_TAG" > release_notes.md
+        echo "" >> release_notes.md
+        
+        if [ -n "$PREVIOUS_TAG" ]; then
+          echo "### 📝 Changes since $PREVIOUS_TAG:" >> release_notes.md
+          echo "" >> release_notes.md
+          
+          # 获取提交信息并分类
+          git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD | grep -E "^- feat" | sed 's/^- feat/✨ **Feature**:/' >> release_notes.md || true
+          git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD | grep -E "^- fix" | sed 's/^- fix/🐛 **Fix**:/' >> release_notes.md || true
+          git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD | grep -E "^- docs" | sed 's/^- docs/📚 **Docs**:/' >> release_notes.md || true
+          git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD | grep -E "^- refactor" | sed 's/^- refactor/♻️ **Refactor**:/' >> release_notes.md || true
+          git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD | grep -E "^- perf" | sed 's/^- perf/⚡ **Performance**:/' >> release_notes.md || true
+          git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD | grep -vE "^- (feat|fix|docs|refactor|perf)" | sed 's/^- /🔧 **Other**: /' >> release_notes.md || true
+        else
+          echo "🎉 Initial release of gocron - A lightweight cron task management system" >> release_notes.md
+        fi
+        
+
+
+    - name: Create Release
+      run: |
+        CURRENT_TAG=${GITHUB_REF#refs/tags/}
+        PRERELEASE_FLAG=""
+        if [[ "$CURRENT_TAG" == *"alpha"* ]] || [[ "$CURRENT_TAG" == *"beta"* ]] || [[ "$CURRENT_TAG" == *"rc"* ]]; then
+          PRERELEASE_FLAG="--prerelease"
+        fi
+        
+        gh release create "$CURRENT_TAG" \
+          --title "Release $CURRENT_TAG" \
+          --notes-file release_notes.md \
+          $PRERELEASE_FLAG \
+          gocron-package/*.tar.gz \
+          gocron-package/*.zip \
+          gocron-node-package/*.tar.gz \
+          gocron-node-package/*.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

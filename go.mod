@@ -11,10 +11,9 @@ require (
 	github.com/gin-gonic/gin v1.11.0
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
 	github.com/go-sql-driver/mysql v1.8.1
+	github.com/gocronx-team/cron v0.0.0-20251030173627-9a49493abdf5
 	github.com/golang/protobuf v1.5.3
-	github.com/jakecoffman/cron v0.0.0-20190106200828-7e2009c226a5
 	github.com/lib/pq v1.10.9
-	github.com/ouqiang/goutil v1.1.1
 	github.com/pquerna/otp v1.5.0
 	github.com/rakyll/statik v0.1.7
 	github.com/sirupsen/logrus v1.6.0
