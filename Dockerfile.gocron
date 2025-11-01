@@ -11,7 +11,7 @@ RUN yarn build
 # Backend build stage
 FROM golang:1.23-alpine AS builder
 
-RUN apk add --no-cache git
+RUN apk add --no-cache git gcc musl-dev sqlite-dev
 
 WORKDIR /app
 COPY go.mod go.sum ./
@@ -27,12 +27,13 @@ RUN go install github.com/rakyll/statik@latest
 # Generate static files (statik will pack web/public)
 RUN go generate ./...
 
-# Build with reduced parallelism for ARM64 stability
-RUN CGO_ENABLED=0 GOMAXPROCS=2 go build -ldflags="-s -w" -trimpath -o gocron ./cmd/gocron
+# Build with CGO enabled for SQLite support
+RUN CGO_ENABLED=1 GOMAXPROCS=2 go build -ldflags="-s -w" -trimpath -o gocron ./cmd/gocron
 
-FROM scratch
+FROM alpine:latest
 
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+RUN apk add --no-cache ca-certificates sqlite-libs
+
 COPY --from=builder /app/gocron /gocron
 
 EXPOSE 5920

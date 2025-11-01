@@ -45,7 +45,7 @@
 
 ### Docker Compose 部署（推荐）
 
-最简单的部署方式，一键启动 gocron 和 gocron-node：
+最简单的部署方式，一键启动 gocron 管理端：
 
 ```bash
 # 1. 下载 docker-compose.yml
@@ -57,6 +57,8 @@ docker-compose up -d
 # 3. 访问 Web 界面
 # http://localhost:5920
 ```
+
+**注意**：Docker Compose 仅部署 gocron 管理端，任务节点（gocron-node）需要单独安装部署。请参考下方「生产部署」章节中的 gocron-node 启动说明。
 
 
 ### 开发环境
