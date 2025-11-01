@@ -57,8 +57,6 @@ docker-compose up -d
 # http://localhost:5920
 ```
 
-For detailed configuration, see [Docker Compose Deployment Guide](docker-compose.README.md)
-
 ### Development Environment
 
 ```bash

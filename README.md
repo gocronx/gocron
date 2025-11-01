@@ -58,7 +58,6 @@ docker-compose up -d
 # http://localhost:5920
 ```
 
-详细配置说明请查看 [Docker Compose 部署指南](docker-compose.README.md)
 
 ### 开发环境
 
