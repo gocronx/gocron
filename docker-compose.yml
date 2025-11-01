@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.gocron
-    image: gocronx/gocron:latest
+    image: gocron:latest
     container_name: gocron
     ports:
       - "5920:5920"

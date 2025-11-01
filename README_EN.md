@@ -37,25 +37,45 @@ Here are some partial screenshots of the system:
 ## Requirements
 
 * Go 1.23+
-* MySQL/PostgreSQL/SQLite
-* Node.js 18+ (for frontend development)
+* Database: MySQL / PostgreSQL / SQLite (see notes below)
+* Node.js 20+ (for frontend development)
+
+## Database Support
+
+| Deployment Method | MySQL | PostgreSQL | SQLite |
+|-------------------|-------|------------|--------|
+| Docker Deployment | ✅ Supported | ✅ Supported | ❌ Not Supported |
+| Binary Deployment | ✅ Supported | ✅ Supported | ✅ Supported |
+| Development Environment | ✅ Supported | ✅ Supported | ✅ Supported |
+
+**Notes**:
+- **Docker Deployment**: Due to cross-platform compilation limitations, Docker images do not support SQLite. Please use MySQL or PostgreSQL
+- **Binary Deployment**: Supports all databases including SQLite (suitable for lightweight deployment and testing)
+- **Production Recommendation**: Use MySQL or PostgreSQL for better performance and distributed deployment support
 
 ## Quick Start
 
 ### Docker Compose Deployment (Recommended)
 
-The simplest deployment method, start gocron and gocron-node with one command:
+The simplest deployment method, start gocron management server with one command:
 
 ```bash
-# 1. Download docker-compose.yml
-wget https://raw.githubusercontent.com/gocronx-team/gocron/master/docker-compose.yml
+# 1. Clone the project
+git clone https://github.com/gocronx-team/gocron.git
+cd gocron
 
-# 2. Start services
+# 2. Start services (automatically builds image)
 docker-compose up -d
 
 # 3. Access web interface
 # http://localhost:5920
 ```
+
+**Notes**:
+- Docker Compose only deploys the gocron management server. Task nodes (gocron-node) need to be installed separately
+- Docker images do not support SQLite. Please use MySQL or PostgreSQL database
+- If you need SQLite, please use binary deployment (see "Production Deployment" section below)
+- Refer to the "Production Deployment" section below for gocron-node startup instructions
 
 ### Development Environment
 

@@ -38,8 +38,21 @@
 ## 环境要求
 
 * Go 1.23+
-* MySQL/PostgreSQL/SQLite
+* 数据库：MySQL / PostgreSQL / SQLite（见下方说明）
 * Node.js 20+ (前端开发)
+
+## 数据库支持说明
+
+| 部署方式 | MySQL | PostgreSQL | SQLite |
+|---------|-------|------------|--------|
+| Docker 部署 | ✅ 支持 | ✅ 支持 | ❌ 不支持 |
+| 二进制部署 | ✅ 支持 | ✅ 支持 | ✅ 支持 |
+| 开发环境 | ✅ 支持 | ✅ 支持 | ✅ 支持 |
+
+**说明**：
+- **Docker 部署**：由于跨平台编译限制，Docker 镜像不支持 SQLite，请使用 MySQL 或 PostgreSQL
+- **二进制部署**：支持所有数据库，包括 SQLite（适合轻量级部署和测试）
+- **生产环境推荐**：使用 MySQL 或 PostgreSQL，性能更好，支持分布式部署
 
 ## 快速开始
 
@@ -48,17 +61,22 @@
 最简单的部署方式，一键启动 gocron 管理端：
 
 ```bash
-# 1. 下载 docker-compose.yml
-wget https://raw.githubusercontent.com/gocronx-team/gocron/master/docker-compose.yml
+# 1. 克隆项目
+git clone https://github.com/gocronx-team/gocron.git
+cd gocron
 
-# 2. 启动服务
+# 2. 启动服务（自动构建镜像）
 docker-compose up -d
 
 # 3. 访问 Web 界面
 # http://localhost:5920
 ```
 
-**注意**：Docker Compose 仅部署 gocron 管理端，任务节点（gocron-node）需要单独安装部署。请参考下方「生产部署」章节中的 gocron-node 启动说明。
+**注意**：
+- Docker Compose 仅部署 gocron 管理端，任务节点（gocron-node）需要单独安装部署
+- Docker 镜像不支持 SQLite，请使用 MySQL 或 PostgreSQL 数据库
+- 如需使用 SQLite，请使用二进制部署方式（见下方「生产部署」章节）
+- 请参考下方「生产部署」章节中的 gocron-node 启动说明
 
 
 ### 开发环境
